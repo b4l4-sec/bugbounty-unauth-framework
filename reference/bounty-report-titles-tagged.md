@@ -31,43 +31,45 @@ This is the single source of truth. Agents reference only the rows relevant to t
 
 ## Distinct High-Signal Titles (deduplicated)
 
-1. Unauthenticated GraphQL webhook creation with secret readback
-2. CI/CD credentials in public build artifact
-3. Unauthenticated storefront config endpoint leaking live keys
-4. Cache poisoning via unsanitized header ($6,000)
-5. Alternate vhost / Host header skips SSO
-6. Istio RBAC case-sensitivity bypass
-7. Unauthenticated Strapi relational-filter leak → admin takeover
-8. Draft auto-save exposing confidential board documents
-9. Webhook replay and forgery in payment notification
-10. Arbitrary file read in AI agent tool without path restrictions
-11. SSRF via DNS rebinding and URL parser differentials
-12. GraphQL SSRF and RCE via introspection and mutation
-13. IDOR via HTTP method swap
-14. Vertical privilege escalation on admin endpoints
-15. Cache deception via static extension
-16. Unauthenticated Firebase full database read/write
-17. Wildcard injection on auto-login key
-18. Unauthenticated realtime channel read/write
-19. Missing access control on roster / employee directory
-20. Unauthenticated access to /actuator/env and /heapdump
-21. Unauthenticated access to /debug/pprof
-22. Missing auth on webhook create/list/update
-23. IDOR on invoices, attachments, documents, orders via ID/UUID swap
-24. Unauthenticated GraphQL query leaking admin data
-25. Missing rate limit enabling mass enumeration
-26. Unauthenticated user enumeration via API
-27. Broken function-level authorization (BFLA)
-28. Unauthenticated access to admin metrics / Grafana
-29. Password reset token leak in response
-30. Improper authentication via response manipulation
-31. Unauthenticated SQL injection in search/filter/login
-32. DOM XSS via innerHTML / postMessage
-33. Sub-user able to delete company records
-34. Unauthenticated testing endpoint exposing internal IP
-35. MariaDB GRANT PROXY unauthorized authentication changes
-36. ACL cache collision privilege inheritance
-37. Unauthenticated access to sensitive employee and customer invoice data
+| Title | Detection Method | Signal | Payout |
+|-------|------------------|--------|--------|
+| Unauthenticated GraphQL webhook creation with secret readback | POST GraphQL mutation | Webhook created / secret returned | $9,500 |
+| CI/CD credentials in public build artifact | GET public artifact URL | Credentials in plaintext | $9,700 |
+| Unauthenticated storefront config endpoint leaking live keys | GET config endpoint | Live keys in JSON | $8,000 |
+| Cache poisoning via unsanitized header | Unsanitized header | Cache poisoning | $6,000 |
+| Alternate vhost / Host header skips SSO | Alternate Host header | Authenticated content | $5,000 |
+| Istio RBAC case-sensitivity bypass | Case-varied path | Roster returned | $3,000 |
+| Unauthenticated Strapi relational-filter leak → admin takeover | Relational filter | Admin takeover | — |
+| Draft auto-save exposing confidential board documents | Draft auto-save | Confidential documents | — |
+| Webhook replay and forgery in payment notification | Webhook replay | Payment notification forged | — |
+| Arbitrary file read in AI agent tool without path restrictions | File reader without fence | Arbitrary file read | — |
+| SSRF via DNS rebinding and URL parser differentials | DNS rebinding / URL parser | Internal response | — |
+| GraphQL SSRF and RCE via introspection and mutation | GraphQL introspection + mutation | SSRF / RCE | — |
+| IDOR via HTTP method swap | Method change | Data returned | — |
+| Vertical privilege escalation on admin endpoints | Call admin API with user token | Admin action | — |
+| Cache deception via static extension | Static extension on auth path | Private data cached | — |
+| Unauthenticated Firebase full database read/write | Firebase rules | Full DB access | — |
+| Wildcard injection on auto-login key | % in key lookup | Key leaked → session | — |
+| Unauthenticated realtime channel read/write | WebSocket subscribe | Messages readable | — |
+| Missing access control on roster / employee directory | GET /roster | Full roster JSON | — |
+| Unauthenticated access to /actuator/env and /heapdump | GET /actuator/* | Secrets / memory | — |
+| Unauthenticated access to /debug/pprof | GET /debug/pprof | Process data | — |
+| Missing auth on webhook create/list/update | POST/GET webhook | Webhook created | — |
+| IDOR on invoices, attachments, documents, orders via ID/UUID swap | ID/UUID swap | Other user data | — |
+| Unauthenticated GraphQL query leaking admin data | GraphQL query | Admin data | — |
+| Missing rate limit enabling mass enumeration | GET loop | Mass data | — |
+| Unauthenticated user enumeration via API | GET with email/param | User exists | — |
+| Broken function-level authorization (BFLA) | Call higher-privilege endpoint | Privileged action | — |
+| Unauthenticated access to admin metrics / Grafana | GET /metrics | Metrics data | — |
+| Password reset token leak in response | Reset flow | Token in response | — |
+| Improper authentication via response manipulation | Response manipulation | Requests as other user | — |
+| Unauthenticated SQL injection in search/filter/login | SQLi payload | SQL data | — |
+| DOM XSS via innerHTML / postMessage | Client-side injection | XSS executed | — |
+| Sub-user able to delete company records | Sub-user action | Company deleted | — |
+| Unauthenticated testing endpoint exposing internal IP | GET testing endpoint | Internal IP | — |
+| MariaDB GRANT PROXY unauthorized authentication changes | GRANT PROXY | Admin takeover | — |
+| ACL cache collision privilege inheritance | ACL cache collision | Privilege inheritance | — |
+| Unauthenticated access to sensitive employee and customer invoice data | GET invoice/employee endpoint | PII + invoices | — |
 
 ## Usage
 
