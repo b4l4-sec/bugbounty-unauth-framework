@@ -1,25 +1,30 @@
 # Mini-Agent: General Exposure
 
 **Agent ID**: `exposure`  
-**Shared reference**: `reference/bounty-report-titles-tagged.md` (exposure/config/dashboard rows only)
+**References**:
+- `reference/bounty-report-titles-tagged.md` (exposure/config/dashboard rows only)
+- `reference/hackbot-unified-ragv2.json` → techniques related to INFO-DISC, Firebase, Grafana, or config leaks (use if available)
 
 ## Relevant patterns
 
 | Title | Detection Method | Signal | Payout |
 |-------|------------------|--------|--------|
-| Hardcoded Credentials: Unauthenticated Storefront Config Endpoint Leaks Live Stripe/AWS/OpenAI keys | GET config/storefront endpoint | Live keys in JSON | $8,000 |
-| Hardcoded Creds in Public Container Image: Keycloak Master Admin Takeover | Image inspect | Master creds in layers | $3,000 |
-| RCE due to unauthenticated Ray Dashboard | GET dashboard endpoint | Dashboard + RCE possible | $3,421 |
-| Unauthenticated full roster endpoint | GET /roster | Full roster JSON | — |
-| Unauthenticated realtime channel read/write | WebSocket subscribe | Messages readable | — |
+| Hardcoded Credentials: Unauthenticated Storefront Config Endpoint Leaks Live Stripe/AWS/OpenAI keys | GET config endpoint | Live keys in JSON | $8,000 |
+| Unauthenticated Firebase Realtime Database read/write | Firebase rules | Full DB access | — |
+| Unauthenticated access to internal Grafana dashboard | GET metrics | Dashboard data | — |
 
 ## Role
 
-Match hosts to YAML profiles and probe for credential or data exposures.
+Match hosts to YAML profiles and probe for credential or data exposures. Use RAG detection indicators when available.
 
 ## What to do
 
 1. Match profiles and probe listed paths.
-2. Record positive hits.
-3. Match to the patterns above.
+2. Check the RAG for matching exposure techniques and apply them.
+3. Record positive hits and match to bounty patterns.
 4. Update coverage.
+
+## Hard rules
+
+- Stay unauthenticated.
+- Prefer RAG techniques when available.
