@@ -1,11 +1,35 @@
-# AI/ML Automation Wordlist
-
-(Truncated for initial commit — full wordlist available in local artifacts)
+# AI/ML Automation Wordlist (starter)
 
 n8n
 flowise
 langflow
 ollama
 jupyter
+jupyterhub
 grafana
-mcp
+prometheus
+minio
+metabase
+keycloak
+node-red
+dify
+retool
+elasticsearch
+jenkins
+airflow
+mlflow
+kubeflow
+ray
+triton
+vllm
+openwebui
+anythingllm
+lobechat
+fastgpt
+maxkb
+dify
+coze
+langsmith
+phoenix
+argo
+argocd

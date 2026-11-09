@@ -1,5 +1,16 @@
-# Unauthenticated Attack Surface Checklist
+# Unauthenticated Attack Surface Checklist (reference)
 
-(Full original checklist is preserved here for reference. See phases and agents for the adapted working versions.)
+Comprehensive checklist covering:
 
-Key sections: Recon & surface enumeration, Framework management & debug endpoints, GraphQL, REST/gRPC, Auth bypasses, Pre-auth business logic, Cloud & infra, Admin panels, Escalation & chaining, Hackbot automation hooks.
+- Recon & surface enumeration
+- Framework management & debug endpoints (Actuator, Jolokia, etc.)
+- GraphQL (unauthenticated)
+- REST / gRPC / internal APIs
+- Auth & authorization bypasses
+- Pre-auth business logic
+- Cloud & infra misconfigurations
+- Admin panels and third-party exposures
+- Escalation & chaining
+- Hackbot automation hooks
+
+This is the source material for the coverage angles and agent prompts. Full checklist is available in the local artifacts.
