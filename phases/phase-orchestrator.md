@@ -46,42 +46,13 @@ state/
 }
 ```
 
-### Coverage schema (`coverage.jsonl`)
-
-```json
-{
-  "timestamp": "2026-11-09T22:15:00Z",
-  "agent": "actuator",
-  "angle": "DEBUG-EXP",
-  "surface": "https://api.example.com/actuator/env",
-  "status": "TESTED|PARTIAL|NOT-TESTED|BLOCKED",
-  "evidence": "raw/responses/actuator-env-200.txt",
-  "notes": "env exposed but secrets masked"
-}
-```
-
-### Findings schema (`findings.jsonl`)
-
-```json
-{
-  "id": "F-001",
-  "agent": "graphql",
-  "host": "api.example.com",
-  "title": "Unauth GraphQL introspection",
-  "severity": "MEDIUM",
-  "evidence": ["raw/responses/graphql-introspection.json"],
-  "status": "candidate",
-  "created": "2026-11-09T22:20:00Z"
-}
-```
-
 ## Inputs
 
 - `raw/live-hosts.txt`, `raw/scope-hosts.txt` (Phase 1a)
 - `raw/js-codex/*/out/endpoints-all.txt`, `orphans.txt`, `secrets.txt` (Phase 1b)
 - Fingerprint results and exposure hits from Phase 1c
 - `checks/unauthenticated_checks.yaml`
-- Filtered RAG slices (only the techniques matching a host’s tech + agent class)
+- Filtered RAG slices
 
 ## Steps
 
@@ -92,50 +63,43 @@ mkdir -p state/memory state/jobs
 touch state/jobs.jsonl state/coverage.jsonl state/findings.jsonl
 ```
 
-If resuming, read the last 50 lines of each JSONL and `state/orchestrator.md` so the coordinator knows what is already done.
-
 ### 2. Build the work inventory
 
-- Load live hosts and high-value endpoints from Phase 1b.
-- For each host, match against known fingerprints (from Phase 1c or httpx tech-detect).
-- Create one job per (endpoint × relevant agent class).
+- Load all live hosts and discovered endpoints from Phase 1a/1b/1c.
+- **Every in-scope external-facing response is eligible** (200, 401, 403, 404, 3xx, 5xx).
+- Do not pre-filter by status code. A 403 or 404 can still be interesting to the right agent.
+- Create jobs by matching signals, but fall back to broad jobs when no strong signal exists:
 
-Agent assignment rules (examples):
+| Signal | Agent | Scope of job |
+|--------|-------|--------------|
+| Spring / actuator paths or Java fingerprints | actuator | Matching hosts |
+| `/graphql` or GraphQL keywords | graphql | Matching hosts |
+| Object IDs in responses or paths | idor | Matching hosts + endpoints |
+| 401/403 on interesting paths | auth-bypass | Matching hosts |
+| Cloud / CNAME / bucket patterns | cloud | Matching hosts |
+| OpenAPI / Swagger paths | spec | Matching hosts |
+| Webhook / image-proxy / URL params | ssrf | Matching hosts |
+| Authenticated-looking paths | cache | Matching hosts |
+| Default / no strong signal | exposure | Remaining hosts |
 
-| Signal | Agent |
-|--------|-------|
-| Spring / actuator paths | actuator |
-| `/graphql` or GraphQL keywords | graphql |
-| Object IDs in responses or paths | idor |
-| 401/403 on interesting paths | auth-bypass |
-| JS secrets or config | js |
-| Cloud bucket / CNAME | cloud |
-| OpenAPI / Swagger | spec |
-| Default | exposure (uses unauthenticated_checks.yaml) |
+- When a host has multiple signals, create multiple jobs (one per agent).
+- When no signal exists, the exposure agent receives the host.
 
 ### 3. Prepare bounded context for each job
 
 For every job, write a small `context_file` containing only:
-
-- The exact host + endpoint
-- Relevant fingerprint
-- 5–10 matching techniques from the RAG (filtered)
-- Any prior coverage rows for that surface
+- The exact host list (or single host)
+- Relevant endpoints already discovered
+- Prior coverage for that surface
 - Agent-specific memory snippet
-
-Do **not** include full response bodies or entire JS files.
 
 ### 4. Dispatch
 
-The orchestrator does not run the agents itself. It either:
-
-- Writes the job files and prints a dispatch list, or
-- Calls the appropriate mini-agent prompt with the job id and context path.
+The orchestrator writes the job files and prints a dispatch list. Agents read their job context and execute.
 
 ### 5. Collect results
 
 After agents finish:
-
 - Append their coverage rows to `state/coverage.jsonl`
 - Append findings to `state/findings.jsonl`
 - Update the job status to `done` or `blocked`
@@ -149,22 +113,12 @@ Write `hunt/orchestrator-summary.md` with jobs created, completed, coverage by a
 
 - Never perform the actual probes. Only schedule and merge.
 - Keep context small. Bulk data stays on disk.
-- Respect Phase 0 scope. Drop any job whose host is out of scope.
-- Do not auto-execute state-changing checks.
+- Respect Phase 0 scope.
 - Update state atomically (append-only JSONL preferred).
 
 ## Handoff
 
 - Mini-agents receive only their job context files.
+- Every agent writes coverage and findings with its own `agent` field.
 - Validation / triage phases read `state/findings.jsonl` and `state/coverage.jsonl`.
 - Future runs resume from the same state directory.
-
-## Mini-agent contract (for reference)
-
-Every mini-agent must:
-
-1. Read its `context_file` and its own `state/memory/<agent>.md`.
-2. Perform only the checks allowed for its class.
-3. Write results to the shared JSONL files (or return them for the orchestrator to append).
-4. Never modify another agent’s memory.
-5. Exit with a clear status (`done`, `blocked`, `partial`).
