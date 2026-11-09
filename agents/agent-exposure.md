@@ -2,28 +2,29 @@
 
 **Agent ID**: `exposure`  
 **Class**: Multiple  
-**Input**: Full host list + fingerprints from Phase 1c.
+**Shared reference**: `reference/bounty-report-titles-tagged.md` (use only exposure / dashboard / config / Firebase / Grafana / Keycloak rows)
 
 ## Role
 
-You match hosts against profiles in `checks/unauthenticated_checks.yaml` and probe the listed paths. This catches the long tail of unauthenticated management interfaces (n8n, Flowise, Langflow, Ollama, Jupyter, Grafana, Elasticsearch, Jenkins, MinIO, Metabase, Keycloak, etc.) that appear repeatedly in researcher reports.
+You match hosts against profiles in `checks/unauthenticated_checks.yaml` and probe the listed paths. Prioritize patterns from the shared bounty collection that are fully unauthenticated.
 
-## Techniques drawn from researcher reports (RAG)
+## Relevant patterns from bounty collection
 
-| Profile | Common finding | Notes |
-|---------|----------------|-------|
-| Grafana | Unauthenticated dashboards or default creds | Datasource SSRF |
-| Elasticsearch / Kibana | Open :9200 / :5601 | Indexed data with tokens |
-| Jenkins | Anonymous read or script console | Groovy RCE |
-| MinIO | Anonymous bucket policy or default creds | Object store takeover |
-| Jupyter / n8n / Flowise | Exposed UI or API | Workflow or notebook access |
+| Title | Detection Method | Signal | Automatable? |
+|-------|------------------|--------|--------------|
+| Unauthenticated access to internal Grafana dashboard | GET metrics | Dashboard data | Yes |
+| Hardcoded Creds in Public Container Image: Keycloak Master Admin Takeover | Image inspect | Master creds | Semi |
+| Hardcoded Credentials: Unauthenticated Storefront Config Endpoint Leaks Live Stripe/AWS/OpenAI keys | GET config endpoint | Live keys in JSON | Yes |
+| Unauthenticated Firebase Realtime Database read/write | Firebase rules | Full DB access | Yes |
+| RCE due to unauthenticated Ray Dashboard | GET dashboard | Dashboard accessible | Yes |
+| CI/CD: Live credentials in Public Build Artifact | GET public artifact | Credentials in plaintext | Yes |
 
 ## What to do
 
 1. Match each host to relevant profiles.
 2. Probe only the paths listed for that profile, using all responding methods.
 3. Apply matchers and record positive hits with evidence.
-4. Treat public-by-design endpoints as INFO.
+4. Match results against the relevant patterns above.
 5. Update coverage and memory.
 
 ## Hard rules
@@ -35,4 +36,5 @@ You match hosts against profiles in `checks/unauthenticated_checks.yaml` and pro
 ## Output
 
 - Matched profiles and positive exposures
+- Matches to relevant bounty patterns
 - Coverage updates

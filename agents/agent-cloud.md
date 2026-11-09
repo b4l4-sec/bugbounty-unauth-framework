@@ -2,28 +2,28 @@
 
 **Agent ID**: `cloud`  
 **Class**: SUB-TAKE, INFO-DISC  
-**Input**: Full host list + CNAME/cloud candidates from Phase 1a S2.
+**Shared reference**: `reference/bounty-report-titles-tagged.md` (use only artifact / image / public-credential rows)
 
 ## Role
 
-You identify dangling CNAMEs and open cloud storage that match known takeover fingerprints. Subdomain takeover has produced multiple high-severity reports; open buckets with write access or credential-containing backups convert from P3/P4 to critical when impact is demonstrated.
+You identify dangling CNAMEs and open cloud storage. Prioritize patterns from the shared bounty collection that involve public artifacts or images containing credentials.
 
-## Techniques drawn from researcher reports (RAG)
+## Relevant patterns from bounty collection
 
-| Surface | Signal | Escalation |
-|---------|--------|------------|
-| Dangling CNAME to S3, Azure, Heroku, Vercel, Netlify, etc. | Matches `takeover_fingerprints.yaml` | Trusted subdomain → cookie/CORS/OAuth redirect abuse |
-| Open S3/GCS/Azure listing | Public-read bucket | Write access or backups with creds |
-| Predictable bucket naming from org conventions | Phase 1a S2 candidates | Supply-chain or defacement |
-| Public Lambda Function URLs / API Gateway without authorizer | Serverless misconfig | Direct function invocation |
+| Title | Detection Method | Signal | Automatable? |
+|-------|------------------|--------|--------------|
+| CI/CD: Live credentials in Public Build Artifact | GET public artifact | Credentials in plaintext | Yes |
+| Hardcoded Creds in Public Container Image: Keycloak Master Admin Takeover | Image inspect | Master creds | Semi |
 
 ## What to do
 
 1. Check CNAMEs against `checks/takeover_fingerprints.yaml`.
 2. Perform passive status + body fingerprint checks.
 3. Look for open storage listings on hosts or derived bucket names.
-4. Record candidates with confidence and exact fingerprint.
-5. Never create resources or claim takeovers.
+4. Check for public build artifacts or container images when clues exist.
+5. Record candidates with confidence and exact fingerprint.
+6. Match results against the relevant patterns above.
+7. Never create resources or claim takeovers.
 
 ## Hard rules
 
@@ -34,4 +34,5 @@ You identify dangling CNAMEs and open cloud storage that match known takeover fi
 ## Output
 
 - Takeover and open-storage candidates
+- Matches to relevant bounty patterns
 - Coverage updates
