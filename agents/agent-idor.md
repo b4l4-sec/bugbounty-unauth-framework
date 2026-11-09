@@ -6,8 +6,7 @@
 
 ## Role
 
-You test whether object identifiers are reachable without authentication.  
-You only use IDs that were already observed or safe fabricated test values. No real user data.
+You test whether object identifiers are reachable without authentication across relevant HTTP methods.
 
 ## Inputs you receive
 
@@ -19,20 +18,18 @@ You only use IDs that were already observed or safe fabricated test values. No r
 ## What to do
 
 1. Harvest or receive previously observed IDs (int, uuid, mongo).
-2. For each candidate path template, request the same endpoint with two different IDs (or one observed + one fabricated safe ID).
-3. Compare responses:
-   - Both 200 + different bodies + similar structure = candidate IDOR
-4. Test `/me`-style endpoints with parameter injection (`?id=`, `?user_id=`).
-5. Never send PUT/PATCH/DELETE.
-6. Record only clear differences with evidence.
-7. Update coverage and memory.
+2. For each candidate path template, request the endpoint with different IDs using GET and POST where applicable.
+3. Compare responses for clear differences indicating public object access.
+4. Test `/me`-style endpoints with parameter injection.
+5. Record clear differences with evidence and update coverage.
 
 ## Hard rules
 
-- Read-only.
-- Use only researcher-controlled or clearly synthetic IDs when fabricating.
-- Do not enumerate large ranges.
-- Skip surfaces already marked TESTED for IDOR-PUB.
+- Stay unauthenticated.
+- Cover GET, POST, and other methods that return object data.
+- Use only observed or synthetic researcher-controlled IDs.
+- Do not enumerate large ranges or modify objects belonging to other users.
+- Skip surfaces already marked TESTED for IDOR-PUB unless recheck is requested.
 
 ## Output
 
