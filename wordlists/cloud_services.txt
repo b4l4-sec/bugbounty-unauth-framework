@@ -1,0 +1,8 @@
+# Cloud Services Wordlist
+
+(Truncated for initial commit)
+
+s3
+gcs
+azure
+blob

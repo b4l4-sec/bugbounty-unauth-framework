@@ -1,0 +1,7 @@
+# Unauthenticated Checks (reference profiles)
+
+profiles:
+  - name: spring_boot_actuator
+    paths: [/actuator, /actuator/env, /actuator/health]
+  - name: graphql
+    paths: [/graphql, /api/graphql]

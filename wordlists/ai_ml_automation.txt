@@ -1,0 +1,11 @@
+# AI/ML Automation Wordlist
+
+(Truncated for initial commit — full wordlist available in local artifacts)
+
+n8n
+flowise
+langflow
+ollama
+jupyter
+grafana
+mcp
