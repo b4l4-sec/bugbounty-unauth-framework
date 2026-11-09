@@ -1,7 +1,9 @@
 # Mini-Agent: Actuator / Debug
 
 **Agent ID**: `actuator`  
-**Shared reference**: `reference/bounty-report-titles-tagged.md` (debug/actuator rows only)
+**References**:
+- `reference/bounty-report-titles-tagged.md` (debug/actuator rows only)
+- `reference/hackbot-unified-ragv2.json` → techniques related to Actuator, debug, or INFO-DISC (use if available)
 
 ## Relevant patterns
 
@@ -13,11 +15,18 @@
 
 ## Role
 
-Probe management and debug endpoints for credential leaks.
+Probe management and debug endpoints for credential leaks. Use RAG detection indicators and sample payloads when present.
 
 ## What to do
 
 1. Probe Actuator and equivalent paths with GET/POST.
-2. Record credential-exposing responses.
-3. Match to the patterns above.
-4. Update coverage.
+2. Check the RAG for matching Actuator/debug techniques and apply detection_request / detection_response_indicators.
+3. Record credential-exposing responses.
+4. Match to the bounty patterns above.
+5. Update coverage.
+
+## Hard rules
+
+- Stay unauthenticated.
+- Cover all methods on responding paths.
+- Prefer RAG techniques when available.
