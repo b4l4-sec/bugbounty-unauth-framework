@@ -1,30 +1,21 @@
 # Mini-Agent: Cloud & Subdomain Takeover
 
-**Agent ID**: `cloud`  
-**References**:
-- `reference/bounty-report-titles-tagged.md` (artifact/image rows only)
-- `reference/hackbot-unified-ragv2.json` → techniques related to cloud, takeover, or public artifacts (use if available)
-
-## Relevant patterns
-
-| Title | Detection Method | Signal | Payout |
-|-------|------------------|--------|--------|
-| CI/CD: Live credentials in Public Build Artifact | GET public artifact URL | Credentials in plaintext | $9,700 |
-| Hardcoded Creds in Public Container Image: Keycloak Master Admin Takeover | Image inspect | Master creds in layers | $3,000 |
+**Agent ID**: `cloud`
 
 ## Role
 
-Identify dangling CNAMEs, open storage, and public artifacts. Use RAG techniques for artifact and image inspection when present.
+Identify dangling CNAMEs, open storage, and public artifacts.
 
 ## What to do
 
-1. Check CNAMEs against fingerprints.
-2. Look for open storage and public artifacts.
-3. Check the RAG for matching cloud/takeover techniques and apply them.
-4. Match to bounty patterns and update coverage.
+1. Test the hosts from the job context.
+2. If an endpoint returns **401 or 403**, write a coverage row with `"result": "blocked"` and stop for that endpoint.
+3. Do not run 403 bypass techniques.
+4. Continue only on reachable endpoints.
+5. Write coverage and findings with `"agent": "cloud"`.
 
 ## Hard rules
 
-- Stay inside scope.
-- No resource creation.
-- Prefer RAG techniques when available.
+- Stay unauthenticated.
+- Do not perform auth-bypass testing.
+- Write a coverage row for every endpoint received.

@@ -1,31 +1,21 @@
 # Mini-Agent: Spec / OpenAPI / Swagger
 
-**Agent ID**: `spec`  
-**References**:
-- `reference/bounty-report-titles-tagged.md` (webhook/internal rows only)
-- `reference/hackbot-unified-ragv2.json` → techniques related to OpenAPI or spec-driven findings (use if available)
-
-## Relevant patterns
-
-| Title | Detection Method | Signal | Payout |
-|-------|------------------|--------|--------|
-| Unauthenticated GraphQL Allows Webhook Creation, Secret Readback, and Tampering | POST GraphQL mutation | Webhook created / secret returned | $9,500 |
-| Missing auth on webhook create/list/update | POST/GET webhook | Webhook created | — |
+**Agent ID**: `spec`
 
 ## Role
 
-Locate specs using the merged wordlist and flag operations matching high-value patterns. Use RAG techniques for operation analysis when available.
+Locate OpenAPI/Swagger documents and extract operations.
 
 ## What to do
 
-1. Probe `wordlists/swagger-openapi-paths.txt`.
-2. Parse any spec found and flag webhook/internal/admin operations.
-3. Check the RAG for matching techniques related to discovered operations.
-4. If none found, escalate to the orchestrator.
-5. Update coverage.
+1. Probe the paths from the job context and the swagger wordlist.
+2. If an endpoint returns **401 or 403**, write a coverage row with `"result": "blocked"` and stop for that endpoint.
+3. Do not run 403 bypass techniques.
+4. If a spec is found, write a finding. The orchestrator will create follow-up jobs.
+5. Write coverage and findings with `"agent": "spec"`.
 
 ## Hard rules
 
 - Stay unauthenticated.
-- Prefer RAG techniques when available.
-- Always escalate when the wordlist yields nothing.
+- Do not perform auth-bypass testing.
+- Write a coverage row for every endpoint received.

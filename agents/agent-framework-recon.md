@@ -1,46 +1,21 @@
-# Mini-Agent: Framework / CMS Recon (Unauthenticated)
+# Mini-Agent: Framework / CMS Recon
 
-**Agent ID**: `framework-recon`  
-**Class**: FRAMEWORK, INFO-DISC, DEBUG-EXP  
-**References**:
-- `reference/unauth-vectors-extract.md`
-- `reference/bounty-report-titles-tagged.md`
-- Full `vectors-frameworks.md` (WordPress, Drupal, Laravel, Django, Spring, etc.)
-- `checks/unauthenticated_checks.yaml`
+**Agent ID**: `framework-recon`
 
 ## Role
 
-When httpx or Phase 1c fingerprints a known CMS or framework, you run the unauthenticated checks specific to that stack. You cover WordPress, Drupal, Laravel, Django, Spring Boot, and other common platforms.
-
-## Activation signals
-
-| Fingerprint | Primary checks |
-|-------------|----------------|
-| WordPress | `/wp-json/`, user enumeration, plugin/theme exposure, xmlrpc, debug files |
-| Drupal | `/jsonapi`, `/node/<id>?_format=json`, user emails, unpublished content |
-| Laravel | `/.env`, `/telescope`, `/horizon`, Ignition debug, Livewire |
-| Django | `DEBUG=True` pages, browsable API, filter oracles |
-| Spring Boot | Actuator paths, mappings, heapdump |
-| Other (Joomla, Magento, etc.) | Framework-specific debug and info endpoints from vectors-frameworks.md |
+Run framework-specific unauthenticated checks when a CMS is fingerprinted.
 
 ## What to do
 
-1. Read the host list and fingerprints from the job context.
-2. For each matched framework, probe the unauthenticated paths listed in `vectors-frameworks.md` for that stack.
-3. Record positive exposures (debug pages, user lists, config leaks, open consoles).
-4. Check the RAG and vector extracts for matching techniques and apply them.
-5. Update coverage and memory.
-6. Escalate high-severity exposures to the orchestrator.
+1. Test the framework paths from the job context.
+2. If an endpoint returns **401 or 403**, write a coverage row with `"result": "blocked"` and stop for that endpoint.
+3. Do not run 403 bypass techniques.
+4. Continue only on reachable endpoints.
+5. Write coverage and findings with `"agent": "framework-recon"`.
 
 ## Hard rules
 
 - Stay unauthenticated.
-- Cover all responding methods on framework paths.
-- Prefer framework-specific checks over generic ones.
-- Do not run destructive actions.
-
-## Output
-
-- Framework-specific exposures with evidence
-- Coverage updates
-- Notes for `state/memory/framework-recon.md`
+- Do not perform auth-bypass testing.
+- Write a coverage row for every endpoint received.
