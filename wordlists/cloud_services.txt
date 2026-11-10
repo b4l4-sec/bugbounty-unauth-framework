@@ -1,0 +1,22 @@
+# Cloud Services Wordlist (starter)
+
+s3
+s3-website
+gcs
+storage.googleapis.com
+azure
+blob.core.windows.net
+cloudfront
+elasticbeanstalk
+herokuapp
+vercel
+netlify
+firebase
+supabase
+appsync
+lambda
+api-gateway
+cloudfunctions
+run.app
+azurewebsites
+cloudapp

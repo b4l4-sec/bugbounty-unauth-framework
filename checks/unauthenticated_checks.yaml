@@ -1,0 +1,30 @@
+# Unauthenticated Checks (starter profiles)
+
+profiles:
+  - name: spring_boot_actuator
+    fingerprint: ["actuator", "spring"]
+    unauthenticated_paths:
+      - /actuator
+      - /actuator/env
+      - /actuator/health
+      - /actuator/info
+      - /actuator/heapdump
+      - /actuator/mappings
+    matchers:
+      - status: 200
+        body_contains: ["propertySources", "activeProfiles"]
+  - name: graphql
+    fingerprint: ["graphql"]
+    unauthenticated_paths:
+      - /graphql
+      - /api/graphql
+    matchers:
+      - status: 200
+        body_contains: ["__schema", "data"]
+  - name: swagger
+    fingerprint: ["swagger", "openapi"]
+    unauthenticated_paths:
+      - /swagger.json
+      - /openapi.json
+      - /v2/api-docs
+      - /v3/api-docs
