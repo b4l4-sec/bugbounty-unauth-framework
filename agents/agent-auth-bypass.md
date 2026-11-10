@@ -5,7 +5,6 @@
 **References**:
 - `reference/bounty-report-titles-tagged.md` (auth-bypass rows only)
 - `reference/hackbot-unified-ragv2.json` → techniques where `vuln_class` is Auth-Bypass (use if available)
-- https://hacktricks.wiki/en/pentesting-web/403-and-401-bypasses.html
 
 ## Relevant patterns
 
@@ -16,38 +15,14 @@
 | Missing Auth via __AppName Parameter | Request with __AppName | Backend action succeeded | $1,000 |
 | Keycloak Reset Credentials Email Gate Bypass | Bypass email check in reset flow | Reset/session granted | $1,500 |
 
-## HackTricks 403/401 Bypass Techniques
-
-### Methods
-- Alternate HTTP methods: GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD, TRACE, CONNECT
-- `X-HTTP-Method-Override` header
-
-### Headers
-- `X-Forwarded-For: 127.0.0.1`, `X-Original-URL`, `X-Rewrite-URL`
-- `X-Originating-IP`, `Client-IP`, `True-Client-IP`
-- Alternate `Host` header (localhost, internal names)
-- Remove `Host` header
-
-### Path tricks
-- Case variation: `/admin` → `/ADMIN`
-- Trailing slash, `//`, `./`, `;`, `.json` suffix
-- Encoded dots: `/%2e/`, `/%252e/`
-- Unicode: `/%ef%bc%8f`
-- `/admin;.css`, `/admin%00`, `/admin%0a`
-
-### Other
-- HTTP/1.0 vs HTTP/1.1
-- Double encoding
-- Parameter pollution on path or query
-
 ## Role
 
-Test unauthenticated access control bypasses. Prioritize patterns from the shared bounty collection and HackTricks techniques.
+Test unauthenticated access control bypasses. Prioritize patterns from the shared bounty collection that are automatable or semi-automatable.
 
 ## What to do
 
 1. Baseline the blocked endpoint (confirm 401/403/SSO redirect and body hash).
-2. Apply one technique at a time from the HackTricks list and bounty patterns.
+2. Apply one technique at a time. Record request + response for every variation.
 3. A bypass is only logged when status changes to 200 and the body is not a login page, soft-404, or baseline match.
 4. Check the RAG for matching Auth-Bypass techniques and apply them.
 5. Save evidence and append to coverage and findings.
@@ -58,7 +33,7 @@ Test unauthenticated access control bypasses. Prioritize patterns from the share
 - Cover all HTTP methods.
 - Do not brute-force credentials or perform clearly destructive actions.
 - Rate-limit and stop on WAF/429.
-- Prefer RAG and HackTricks techniques when available.
+- Prefer RAG techniques when available.
 
 ## Output
 
