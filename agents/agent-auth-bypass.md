@@ -1,46 +1,45 @@
 # Mini-Agent: Auth-Bypass
 
 **Agent ID**: `auth-bypass`  
-**Class**: Auth-Bypass  
-**Based on**: Previous hackbot `bb-auth-bypass` checklist
+**Class**: Auth-Bypass
 
-## Checklist
+## Checklist (current framework paths)
 
 ### Mapping
-- [ ] Auth mechanism identified (JWT / cookie / API key / OAuth) → `vulns/auth-bypass/auth-map.json`
+- [ ] Auth mechanism identified (JWT / cookie / API key / OAuth) → `state/memory/auth-bypass-map.json`
 - [ ] JWT claims analyzed (if JWT)
 
 ### JWT Tests (if applicable)
-- [ ] `alg=none` tested → `vulns/auth-bypass/jwt-findings.json`
+- [ ] `alg=none` tested
 - [ ] Algorithm confusion noted for manual check (if RS256)
 - [ ] Role/privilege claim manipulation tested
 - [ ] Expired token acceptance tested
 
 ### Missing Auth
-- [ ] All API endpoints tested without credentials → `vulns/auth-bypass/missing-auth-findings.json`
-- [ ] Sensitive endpoints identified that respond with data when unauthenticated
+- [ ] All provided endpoints tested without credentials
+- [ ] Sensitive endpoints that return data when unauthenticated are recorded
 
 ### Bypass Techniques
-- [ ] Path traversal bypasses tested → `vulns/auth-bypass/path-bypass-findings.json`
-- [ ] Header-based bypasses tested (especially Host header) → `vulns/auth-bypass/header-bypass-findings.json`
+- [ ] Path traversal bypasses tested
+- [ ] Header-based bypasses tested (especially Host header)
 
 ### Findings
-- [ ] All findings compiled → `vulns/auth-bypass/findings.json`
-- [ ] Screenshots for confirmed findings → `vulns/auth-bypass/evidence/screenshots/`
-- [ ] Activity logged to `logs/activity.jsonl`
+- [ ] All findings written to `state/findings.jsonl` with `"agent": "auth-bypass"`
+- [ ] Coverage rows written to `state/coverage.jsonl`
+- [ ] Notes written to `state/memory/auth-bypass.md`
 
 ## Role
 
-Identify the auth mechanism on the hosts you receive, then test for missing authentication and common bypasses (path, header, JWT). Prioritize Host header bypasses when an SSO or auth gate is present.
+Identify the auth mechanism on the hosts you receive, then test for missing authentication and common bypasses (path and header, with focus on Host header).
 
 ## What to do
 
-1. Map the auth mechanism for each host (JWT, cookie, API key, OAuth/SSO).
+1. Map the auth mechanism for each host.
 2. Test all provided endpoints without credentials and record those that return data.
 3. Test path traversal and header-based bypasses (focus on `Host` header variations).
 4. If JWT is used, test `alg=none`, claim manipulation, and expired tokens.
-5. Write results to the files listed in the checklist above.
-6. Also append a summary row to `state/coverage.jsonl` and `state/findings.jsonl` with `"agent": "auth-bypass"`.
+5. Write every result to `state/coverage.jsonl` and confirmed findings to `state/findings.jsonl` using `"agent": "auth-bypass"`.
+6. Keep a short summary in `state/memory/auth-bypass.md`.
 
 ## Hard rules
 
@@ -51,6 +50,5 @@ Identify the auth mechanism on the hosts you receive, then test for missing auth
 
 ## Output
 
-- Checklist files under `vulns/auth-bypass/`
-- Coverage and findings rows in the shared state
-- Notes in `state/memory/auth-bypass.md`
+- Rows in `state/coverage.jsonl` and `state/findings.jsonl`
+- Summary in `state/memory/auth-bypass.md`
