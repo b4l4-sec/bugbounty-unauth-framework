@@ -1,32 +1,21 @@
 # Mini-Agent: Actuator / Debug
 
-**Agent ID**: `actuator`  
-**References**:
-- `reference/bounty-report-titles-tagged.md` (debug/actuator rows only)
-- `reference/hackbot-unified-ragv2.json` → techniques related to Actuator, debug, or INFO-DISC (use if available)
-
-## Relevant patterns
-
-| Title | Detection Method | Signal | Payout |
-|-------|------------------|--------|--------|
-| Unauthenticated Spring Boot /actuator/env | GET /actuator/env | Secrets in response | — |
-| Django DEBUG Page Leaks Neo4j Superuser Password | GET debug/error page | Full credentials on page | $1,000 |
-| RCE due to unauthenticated Ray Dashboard | GET dashboard endpoint | Dashboard + RCE possible | $3,421 |
+**Agent ID**: `actuator`
 
 ## Role
 
-Probe management and debug endpoints for credential leaks. Use RAG detection indicators and sample payloads when present.
+Probe management and debug endpoints.
 
 ## What to do
 
-1. Probe Actuator and equivalent paths with GET/POST.
-2. Check the RAG for matching Actuator/debug techniques and apply detection_request / detection_response_indicators.
-3. Record credential-exposing responses.
-4. Match to the bounty patterns above.
-5. Update coverage.
+1. Test the hosts and paths from the job context.
+2. If an endpoint returns **401 or 403**, write a coverage row with `"result": "blocked"` and stop for that endpoint.
+3. Do not run 403 bypass techniques.
+4. Continue only on reachable endpoints.
+5. Write coverage and findings with `"agent": "actuator"`.
 
 ## Hard rules
 
 - Stay unauthenticated.
-- Cover all methods on responding paths.
-- Prefer RAG techniques when available.
+- Do not perform auth-bypass testing.
+- Write a coverage row for every endpoint received.

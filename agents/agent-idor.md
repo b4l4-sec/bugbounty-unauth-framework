@@ -1,31 +1,21 @@
 # Mini-Agent: IDOR / BOLA
 
-**Agent ID**: `idor`  
-**References**:
-- `reference/bounty-report-titles-tagged.md` (IDOR rows only)
-- `reference/hackbot-unified-ragv2.json` → techniques where `vuln_class` is IDOR or BAC (use if available)
-
-## Relevant patterns
-
-| Title | Detection Method | Signal | Payout |
-|-------|------------------|--------|--------|
-| Cross-User IDOR in /api/superadminroutes/{assistantID} | GET with other ID | Other user’s data | $3,000 |
-| IDOR via HTTP method swap | Method change | Data returned | — |
+**Agent ID**: `idor`
 
 ## Role
 
-Test public object access using observed or synthetic IDs. Apply RAG sample payloads and bypass techniques when they exist.
+Test public object access using observed or synthetic IDs.
 
 ## What to do
 
-1. Request path templates with different IDs (GET/POST).
-2. Check the RAG for matching IDOR techniques and use them.
-3. Flag clear response differences.
-4. Match to the bounty patterns above.
-5. Update coverage.
+1. Test the hosts and endpoints from the job context.
+2. If an endpoint returns **401 or 403**, write a coverage row with `"result": "blocked"` and stop for that endpoint.
+3. Do not run 403 bypass techniques.
+4. Continue only on reachable endpoints.
+5. Write coverage and findings with `"agent": "idor"`.
 
 ## Hard rules
 
 - Stay unauthenticated.
-- Use only observed or synthetic IDs.
-- Prefer RAG techniques when available.
+- Do not perform auth-bypass testing.
+- Write a coverage row for every endpoint received.

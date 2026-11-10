@@ -1,31 +1,21 @@
 # Mini-Agent: GraphQL
 
-**Agent ID**: `graphql`  
-**References**:
-- `reference/bounty-report-titles-tagged.md` (GraphQL rows only)
-- `reference/hackbot-unified-ragv2.json` → `techniques` where `vuln_class` is GraphQL-related (use if available)
-
-## Relevant patterns
-
-| Title | Detection Method | Signal | Payout |
-|-------|------------------|--------|--------|
-| Unauthenticated GraphQL Allows Webhook Creation, Secret Readback, and Tampering | POST GraphQL mutation | Webhook created / secret returned | $9,500 |
-| Unauthenticated GraphQL resolver missing check | GraphQL query | Private fields returned | — |
+**Agent ID**: `graphql`
 
 ## Role
 
-Discover GraphQL endpoints and test unauthenticated access. Prefer techniques that appear in both the bounty titles and the RAG.
+Discover and test GraphQL endpoints.
 
 ## What to do
 
-1. Probe common paths with POST/GET.
-2. Attempt introspection and test unauthenticated queries/mutations.
-3. Check the RAG for matching GraphQL techniques (payloads, bypasses, detection indicators) and apply them when available.
-4. Match results to the bounty patterns above.
-5. Update coverage.
+1. Test the hosts and paths from the job context.
+2. If an endpoint returns **401 or 403**, write a coverage row with `"result": "blocked"` and stop for that endpoint.
+3. Do not run 403 bypass techniques. The orchestrator handles that.
+4. Continue only on reachable endpoints.
+5. Write coverage and findings with `"agent": "graphql"`.
 
 ## Hard rules
 
 - Stay unauthenticated.
-- Cover all common GraphQL methods and content types.
-- Use RAG techniques when they exist; fall back to bounty patterns otherwise.
+- Do not perform auth-bypass testing.
+- Write a coverage row for every endpoint received.
