@@ -11,21 +11,21 @@ Only the orchestrator creates follow-up jobs.
 | What an agent sees | What the agent does | What the orchestrator does |
 |--------------------|---------------------|----------------------------|
 | 200 with interesting content | Writes finding + coverage | Reads finding |
-| 403 | Writes coverage row with `"status_code": 403` and `"result": "blocked"` | Creates a new job for `403-bypass` on that exact endpoint |
-| 401 | Writes coverage row with `"status_code": 401` | No automatic 403-bypass job (handled differently if needed) |
+| 403 | Writes coverage row with `"status_code": 403` and `"result": "blocked"` | Creates a new job for `403-bypass` |
+| 401 | Writes coverage row with `"status_code": 401` and `"result": "blocked"` | Creates a new job for `auth-bypass` |
 | Spec found | Writes finding | Creates follow-up jobs based on operations |
 | No signal | Writes coverage row | Marks job done |
 
-## 403 → 403-bypass job
+## 401 → auth-bypass job
 
 When the orchestrator sees:
 
 ```json
 {
-  "agent": "ssrf",
-  "host": "api.example.com",
-  "endpoint": "/webhook",
-  "status_code": 403,
+  "agent": "exposure",
+  "host": "mail.verisk.com",
+  "endpoint": "/api",
+  "status_code": 401,
   "result": "blocked"
 }
 ```
@@ -34,16 +34,16 @@ It creates:
 
 ```json
 {
-  "id": "job-403-bypass-001",
-  "agent": "403-bypass",
-  "host": "api.example.com",
-  "endpoint": "/webhook",
-  "reason": "403 reported by ssrf",
+  "id": "job-auth-bypass-001",
+  "agent": "auth-bypass",
+  "host": "mail.verisk.com",
+  "endpoint": "/api",
+  "reason": "401 reported by exposure",
   "status": "pending"
 }
 ```
 
-`403-bypass` receives only the blocked endpoint. `auth-bypass` stays as a separate agent for other auth-related work.
+`auth-bypass` receives only the 401 endpoints and applies the techniques from HackTricks and the infosecwriteups article.
 
 ## Steps
 
@@ -51,4 +51,5 @@ It creates:
 2. Agents run and write coverage + findings.
 3. Orchestrator reads `state/coverage.jsonl`.
 4. For every 403 row, create a `403-bypass` job if one does not already exist.
-5. Merge findings and write summary.
+5. For every 401 row, create an `auth-bypass` job if one does not already exist.
+6. Merge findings and write summary.
